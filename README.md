@@ -59,12 +59,21 @@ So in summary, bedrock refers to the hard, solid rock layer under the loose surf
 
 - `brk`
   Use this command to interact with Bedrock.
-  Followed by the prompt like this: `brk Hello, nice to meet you.`
+  Followed by the prompt like: `brk Hello, nice to meet you.`
 
 - `brk -t`
   Use this command if you want Bedrock to do the translation for you.
-  You can use like this: `brk -t What's the highest mountain in the world?`
+  You can use like: `brk -t What's the highest mountain in the world?`
 
 - `brk -c`
   You can update config with this command.
-  Currently,
+  Currently, the following properties are available:
+
+| Key          | Description  | Type     | Default                 |
+| ------------ | ------------ | -------- | ----------------------- |
+| AWS_REGION   | AWS region   | string   | NA                      |
+| MODEL_ID     | Model ID     | string   | anthropic.claude-v2     |
+| ENDPOINT_URL | Endpoint URL | string   | NA                      |
+| LANGS        | Languages    | string[] | ["English", "Japanese"] |
+
+You can use this command like: `brk -c AWS_REGION us-west-2.`

@@ -114,5 +114,4 @@ function bedrock_internal() {
     invoke_bedrock "$body"
 }
 initialize_config
-export -f brk
 alias brk='noglob bedrock_internal'

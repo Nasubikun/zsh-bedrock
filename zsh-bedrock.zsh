@@ -121,3 +121,4 @@ function bedrock_internal() {
 }
 initialize_config
 export -f brk
+alias brk='noglob brk'

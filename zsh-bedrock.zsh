@@ -1,7 +1,7 @@
 CONFIG_DIR="$HOME/.config/zsh-bedrock"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 # Function to initialize configuration with default values
-function brk-initialize_config() {
+function bedrock-zsh-initialize_config() {
     mkdir -p "$CONFIG_DIR"
     if [[ ! -f "$CONFIG_FILE" ]]; then
         cat >"$CONFIG_FILE" <<-'EOF'
@@ -14,12 +14,12 @@ EOF
     fi
 }
 # Function to read a value from the configuration file
-function brk-config_get() {
+function bedrock-zsh-config_get() {
     local key=$1
     jq -r ".$key // empty" "$CONFIG_FILE"
 }
 # Function to set a value in the configuration file
-function brk-config_set() {
+function bedrock-zsh-config_set() {
     local key=$1
     local value=$2
     if [[ $key == "LANGS" ]]; then
@@ -39,7 +39,7 @@ ALLOWED_KEYS=(
 )
 
 # Helper function to create the body string
-function brk-build_body() {
+function bedrock-zsh-build_body() {
     local custom_prompt=$1
     local template=$2
     local body=$(printf "$template" "$custom_prompt")
@@ -47,25 +47,25 @@ function brk-build_body() {
     echo "{\\\"prompt\\\":\\\"$escaped_body\\\",\\\"max_tokens_to_sample\\\":300,\\\"temperature\\\":0.8,\\\"top_k\\\":250,\\\"top_p\\\":0.999,\\\"stop_sequences\\\":[\\\"\\\\n\\\\nHuman:\\\"],\\\"anthropic_version\\\":\\\"bedrock-2023-05-31\\\"}"
 }
 # Function to generate the body of the command with a raw template and a custom prompt
-function brk-raw_prompt() {
+function bedrock-zsh-raw_prompt() {
     local custom_prompt=$1
     local template="\\\\n\\\\nHuman: %s\\\\n\\\\nAssistant: "
-    brk-build_body "$custom_prompt" "$template"
+    bedrock-zsh-build_body "$custom_prompt" "$template"
 }
 # Function to generate the body of the command with a translation template and a custom prompt
-function brk-translate_prompt() {
+function bedrock-zsh-translate_prompt() {
     local custom_prompt=$1
-    local langs=$(brk-config_get LANGS | jq -r '.[]')
+    local langs=$(bedrock-zsh-config_get LANGS | jq -r '.[]')
     local lang1=$(echo "$langs" | head -1)
     local lang2=$(echo "$langs" | tail -1)
     local template="\\\\n\\\\nHuman: Please translate the <sentence>. If $lang1 is passed, translate to $lang2, if $lang2 is passed translate to $lang1. NEVER output anything other than the translation. <sentence>%s</sentence>\\\\n\\\\nAssistant: "
-    brk-build_body "$custom_prompt" "$template"
+    bedrock-zsh-build_body "$custom_prompt" "$template"
 }
-function brk-invoke_bedrock() {
+function bedrock-zsh-invoke_bedrock() {
     local body=$1
-    local AWS_REGION=$(brk-config_get AWS_REGION)
-    local MODEL_ID=$(brk-config_get MODEL_ID)
-    local ENDPOINT_URL=$(brk-config_get ENDPOINT_URL)
+    local AWS_REGION=$(bedrock-zsh-config_get AWS_REGION)
+    local MODEL_ID=$(bedrock-zsh-config_get MODEL_ID)
+    local ENDPOINT_URL=$(bedrock-zsh-config_get ENDPOINT_URL)
     # Build the command
     local cmd="aws bedrock-runtime invoke-model"
     [[ -n $AWS_REGION ]] && cmd+=" --region $AWS_REGION"
@@ -80,19 +80,19 @@ function brk-invoke_bedrock() {
     eval $cmd
 }
 
-function brk-bedrock_internal() {
+function bedrock-zsh-brk_internal() {
     if [[ $1 == "-c" ]]; then
         if [[ -n ${ALLOWED_KEYS[$2]} ]]; then
             if [[ $2 == "LANGS" ]]; then
                 if [[ $(echo "$3" | jq '. | length') -eq 2 ]]; then
-                    brk-config_set "$2" "$3"
+                    bedrock-zsh-config_set "$2" "$3"
                     echo "Configuration updated: $2 = $3"
                 else
                     echo "Error: LANGS array must have exactly 2 elements." >&2
                     return 1
                 fi
             else
-                brk-config_set "$2" "$3"
+                bedrock-zsh-config_set "$2" "$3"
                 echo "Configuration updated: $2 = $3"
             fi
         else
@@ -102,10 +102,10 @@ function brk-bedrock_internal() {
         return
     fi
     # Default to raw prompt mode
-    local mode=brk-raw_prompt
+    local mode=bedrock-zsh-raw_prompt
     # Check for -t option
     if [[ $1 == "-t" ]]; then
-        mode=brk-translate_prompt
+        mode=bedrock-zsh-translate_prompt
         shift # Remove the -t argument
     fi
     local prompt="$*" # Capture all remaining args as a single string
@@ -114,4 +114,4 @@ function brk-bedrock_internal() {
     brk-invoke_bedrock "$body"
 }
 brk-initialize_config
-alias brk='noglob brk-bedrock_internal'
+alias brk='noglob bedrock-zsh-brk_internal'

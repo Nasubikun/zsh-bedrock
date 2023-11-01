@@ -80,12 +80,6 @@ function invoke_bedrock() {
     eval $cmd
 }
 
-# Function to invoke the AWS Bedrock model
-function brk() {
-    # Disable globbing for this function
-    noglob bedrock_internal "$@"
-}
-
 function bedrock_internal() {
     if [[ $1 == "-c" ]]; then
         if [[ -n ${ALLOWED_KEYS[$2]} ]]; then
@@ -121,4 +115,4 @@ function bedrock_internal() {
 }
 initialize_config
 export -f brk
-alias brk='noglob brk'
+alias brk='noglob bedrock_internal'

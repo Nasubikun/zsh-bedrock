@@ -111,7 +111,7 @@ function bedrock-zsh-brk_internal() {
     local prompt="$*" # Capture all remaining args as a single string
     # Get the body string from the appropriate function based on mode
     local body=$($mode "$prompt")
-    brk-invoke_bedrock "$body"
+    bedrock-zsh-invoke_bedrock "$body"
 }
-brk-initialize_config
+bedrock-zsh-initialize_config
 alias brk='noglob bedrock-zsh-brk_internal'

@@ -113,5 +113,28 @@ function bedrock-zsh-brk_internal() {
     local body=$($mode "$prompt")
     bedrock-zsh-invoke_bedrock "$body"
 }
+
+function _bedrock-zsh-brk_internal_completion {
+    local -a opts
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+    _arguments -C \
+        '-c[Configuration option]:configuration option:->conf_opts' \
+        '*:: :->extra_args'
+    case $state in
+    conf_opts)
+        local -a conf_opts
+        conf_opts=(
+            'AWS_REGION:AWS region, e.g. us-west-2'
+            'MODEL_ID:Model ID, e.g. anthropic.claude-v2'
+            'ENDPOINT_URL:Endpoint URL'
+            'LANGS:Languages, e.g. ["English", "Japanese"]'
+        )
+        _describe 'configuration option' conf_opts
+        ;;
+    esac
+}
+
 bedrock-zsh-initialize_config
 alias brk='noglob bedrock-zsh-brk_internal'
+compdef _bedrock-zsh-brk_internal_completion bedrock-zsh-brk_internal

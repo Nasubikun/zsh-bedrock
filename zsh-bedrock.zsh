@@ -1,4 +1,33 @@
-#!/usr/bin/env zsh
+CONFIG_DIR="$HOME/.config/zsh-bedrock"
+CONFIG_FILE="$CONFIG_DIR/config.json"
+# Function to initialize configuration with default values
+function initialize_config() {
+    mkdir -p "$CONFIG_DIR"
+    if [[ ! -f "$CONFIG_FILE" ]]; then
+        cat >"$CONFIG_FILE" <<-'EOF'
+{
+    "MODEL_ID": "anthropic.claude-v2",
+    "LANGS": ["Japanese", "English"]
+}
+EOF
+        echo "Configuration initialized with default values."
+    fi
+}
+# Function to read a value from the configuration file
+function config_get() {
+    local key=$1
+    jq -r ".$key // empty" "$CONFIG_FILE"
+}
+# Function to set a value in the configuration file
+function config_set() {
+    local key=$1
+    local value=$2
+    if [[ $key == "LANGS" ]]; then
+        jq ".${key} = $value" "$CONFIG_FILE" >"$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    else
+        jq ".${key} = \"$value\"" "$CONFIG_FILE" >"$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    fi
+}
 
 # Define allowed keys
 declare -A ALLOWED_KEYS
@@ -92,3 +121,26 @@ function bedrock_internal() {
 }
 initialize_config
 export -f brk
+
+function _brk_completion {
+    local -a opts
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+    _arguments -C \
+        '-c[Configuration option]:configuration option:->conf_opts' \
+        '*:: :->extra_args'
+    case $state in
+    conf_opts)
+        local -a conf_opts
+        conf_opts=(
+            'AWS_REGION:AWS region, e.g. us-west-2'
+            'MODEL_ID:Model ID, e.g. anthropic.claude-v2'
+            'ENDPOINT_URL:Endpoint URL'
+            'LANGS:Languages, e.g. ["English", "Japanese"]'
+        )
+        _describe 'configuration option' conf_opts
+        ;;
+    esac
+}
+# Associate _brk_completion with brk command
+compdef _brk_completion brk

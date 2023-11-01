@@ -1,5 +1,3 @@
 #!/usr/bin/env zsh
 
-source ./lib/config.zsh
-source ./bin/brk.zsh
-source ./completions/_brk_completion.zsh
+source ${0:A:h}/zsh-bedrock.zsh

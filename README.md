@@ -30,7 +30,7 @@ source zsh-bedrock.zsh
 
 ## Prerequisite
 
-Install AWS CLI 2.13.x can use `aws bedrock-runtime`
+Install AWS CLI 2.13.x+ can use `aws bedrock-runtime`
 
 ## Usage
 

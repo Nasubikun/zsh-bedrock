@@ -28,6 +28,10 @@ curl https://raw.githubusercontent.com/Nasubikun/zsh-bedrock/main/zsh-bedrock.zs
 source zsh-bedrock.zsh
 ```
 
+## Prerequisite
+
+Install AWS CLI 2.13.x+ can use `aws bedrock-runtime`
+
 ## Usage
 
 ```

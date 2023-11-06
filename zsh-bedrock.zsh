@@ -29,15 +29,6 @@ function bedrock-zsh-config_set() {
     fi
 }
 
-# Define allowed keys
-declare -A ALLOWED_KEYS
-ALLOWED_KEYS=(
-    [AWS_REGION]=1
-    [MODEL_ID]=1
-    [ENDPOINT_URL]=1
-    [LANGS]=1
-)
-
 # Helper function to create the body string
 function bedrock-zsh-build_body() {
     local custom_prompt=$1
@@ -81,6 +72,13 @@ function bedrock-zsh-invoke_bedrock() {
 }
 
 function bedrock-zsh-brk_internal() {
+    declare -A ALLOWED_KEYS
+    ALLOWED_KEYS=(
+        [AWS_REGION]=1
+        [MODEL_ID]=1
+        [ENDPOINT_URL]=1
+        [LANGS]=1
+    )
     if [[ $1 == "-c" ]]; then
         if [[ -n ${ALLOWED_KEYS[$2]} ]]; then
             if [[ $2 == "LANGS" ]]; then
